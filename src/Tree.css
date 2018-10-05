@@ -1,0 +1,19 @@
+@import '~antd/dist/antd.css';
+.modalinput{
+    width:100%;
+}
+.treeicon{
+    height: 20px;
+    width:20px;
+}
+.treebutton{
+    border-style: none;
+    /*height: 20px;*/
+    width: 10px;
+    background-color: aliceblue;
+}
+.icon, .icon:hover,.treebutton:hover{
+    background-color: aliceblue;
+
+}
+
