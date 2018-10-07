@@ -56,6 +56,9 @@ class ITree extends Component {
 
     //Generated file directory
     renderTreeNodes = (data) => {
+        if(data.length===0){
+            return;
+        }
         return data.map((item) => {
             if (item.children) {
                 return (
