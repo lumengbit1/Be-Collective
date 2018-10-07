@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import './Tree.css';
-import {Tree} from 'antd';
+import {Tree,Divider } from 'antd';
 
 const DirectoryTree = Tree.DirectoryTree;
 const TreeNode = Tree.TreeNode;
-const url = "http://127.0.0.1:3000/structure/";
+const url = "http://127.0.0.1:3000/data";
+//const url = "https://chal-locdrmwqia.now.sh/";
 
 
 
@@ -15,152 +16,70 @@ class ITree extends Component {
 
         this.state={
             treeData: [],
-            treeKey:[],
-            ModalText: 'Content of the modal dialog',
-            treelevel:null,
-            editvisible: false,
-            delvisible:false,
-            NodeTreeItem: null,
-            modalinput:'Please enter the value of the tree node!',
-            ekey:null,
-            modalselect:null,
-            alldata:null,
-
         }
     };
+
     async componentDidMount(){
-
         let response = await fetch(url);
         let lastGist = await response.json();
-        this.setState({alldata:lastGist});
-        let temdata = this.state.treeData;
-        //  let alldata = this.state.allData;
-        //  console.log(lastGist.structure.level)
+       // this.setState({treeData: lastGist.data});
+        this.setState({treeData: lastGist});
+    }
 
-        let i = 0;
-        for (let index of lastGist) {
-            if (index.level==="0"){
-                temdata[i] = index;
+    readablizeBytes = (bytes) =>{
+        var s = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
+        var e = Math.floor(Math.log(bytes)/Math.log(1024));
+        return (bytes/Math.pow(1024, Math.floor(e))).toFixed(2)+" "+s[e];
+    }
+
+    totalFiles=(obj)=>{
+        let num=0;
+        let file=(o)=> {
+            for (let item of o) {
+                if (item.type === 'file') {
+                    num++;
+                } else if (item.children) {
+                    //this.totalFiles(item.children)
+                    file(item.children)
+
+
+                }
             }
-
-            i++;
+            return num;
         }
-
-        this.setState({treeData: temdata});
-
-
-
-
+        let totalnum = file(obj);
+        return totalnum
     }
-    onSelect = (info) => {
-        //console.log('selected', info);
-        this.setState({treeKey:info});
-        this.props.handleTreeselect(info);
-        //   console.log(this.state.treeKey)
-    }
-    onLoadData = async(treeNode) => {
 
-        //     let response = await fetch('./treeListData.json');
-        let response = await fetch(url);
-        let lastGist = await response.json();
-        const treeData = [...this.state.treeData];
-        const arr = [];
-        let level=0;
-        //   console.log(treeNode.props.eventKey)
-        for(let index of lastGist) {
-            //    let num = index.replace(/[^0-9]/ig,"");
-            //      console.log(`${lastGist.index.name}`)
-            let num = Number(index.level);
-            //        console.log(num)
-
-            if(num>level){
-                level = num;
+    renderTreeNodes = (data) => {
+        return data.map((item) => {
+            if (item.children) {
+                return (
+                    <TreeNode title={item.name+((item.size)?' '+this.readablizeBytes(item.size):'')}  dataRef={item} isLeaf={(item.type==='file')?true:false}>
+                        {this.renderTreeNodes(item.children)}
+                    </TreeNode>
+                );
             }
-
-
-            if(treeNode.props.eventKey.length+1===index.key.length&&treeNode.props.eventKey===index.pid){
-                arr.push({name:index.name,key:index.key})
-            };
-
-
-
-            //     console.log(index)
-        }
-
-
-        //     console.log(arr)
-        this.setState({treelevel:level});
-        console.log('level:'+level)
-        this.getNewTreeData(treeData, treeNode.props.eventKey, arr, level);
-        //   console.log(treeData)
-        this.setState({treeData: treeData });
-
-
+            return <TreeNode title={item.name+((item.size)?' '+this.readablizeBytes(item.size):'')} dataRef={item} isLeaf={(item.type==='file')?true:false}/>;
+        });
     }
 
-
-    setLeaf=(treeData, curKey, level) =>{
-        const loopLeaf = (data, lev) => {
-            const l = lev - 1;
-            data.forEach((item) => {
-                if ((item.key.length > curKey.length) ? item.key.indexOf(curKey) !== 0 :
-                    curKey.indexOf(item.key) !== 0) {
-                    return;
-                }
-                if (item.children) {
-                    loopLeaf(item.children, l);
-                } else if (l < 1) {
-                    item.isLeaf = true;
-                }
-            });
-        };
-        loopLeaf(treeData, level + 1);
-    }
-
-    getNewTreeData=(treeData, curKey, child, level)=> {
-        const loop = (data) => {
-            if (level < 1 || curKey.length - 3 > level * 2) return;
-            data.forEach((item) => {
-                if (curKey.indexOf(item.key) === 0) {
-                    if (item.children) {
-                        loop(item.children);
-                    } else {
-                        item.children = child;
-                    }
-                }
-            });
-        };
-        loop(treeData);
-        //     console.log(treeData)
-        this.setLeaf(treeData, curKey, level);
-    }
 
 
 
 
     render() {
 
-        const loop = data => data.map((item) => {
-            if (item.children) {
-                return <TreeNode title={item.name} key={item.key}>{loop(item.children)}</TreeNode>;
-            }
-            return <TreeNode title={item.name} key={item.key} isLeaf={item.isLeaf} disabled={item.key === '0-0-0'} />;
-        });
-        const treeNodes = loop(this.state.treeData);
-
         return (
             <div>
-                    {
-                        this.state.treeData.length
-                            ?
-                            <DirectoryTree defaultExpandAll onSelect={this.onSelect} loadData={this.onLoadData} >
-                                {treeNodes}
-                            </DirectoryTree>
-                            :
-                            null
-                    }
+            <DirectoryTree >
+                {this.renderTreeNodes(this.state.treeData)}
+            </DirectoryTree>
+            <Divider />
+                {'Total Files:'+this.totalFiles(this.state.treeData)}
+                <br/>
+                {'Total Filesize:'}
             </div>
-
 
 
 
