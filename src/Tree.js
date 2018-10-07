@@ -4,8 +4,8 @@ import {Tree,Divider } from 'antd';
 
 const DirectoryTree = Tree.DirectoryTree;
 const TreeNode = Tree.TreeNode;
-const url = "http://127.0.0.1:3000/data";
-//const url = "https://chal-locdrmwqia.now.sh/";
+//const url = "http://127.0.0.1:3000/data";
+const url = "https://chal-locdrmwqia.now.sh/";
 
 
 
@@ -22,8 +22,8 @@ class ITree extends Component {
     async componentDidMount(){
         let response = await fetch(url);
         let lastGist = await response.json();
-       // this.setState({treeData: lastGist.data});
-        this.setState({treeData: lastGist});
+        this.setState({treeData: lastGist.data});
+        //this.setState({treeData: lastGist});
     }
 
     readablizeBytes = (bytes) =>{
@@ -33,11 +33,12 @@ class ITree extends Component {
     }
 
     totalFiles=(obj)=>{
-        let num=0;
+        let num=0,size=0;
         let file=(o)=> {
             for (let item of o) {
                 if (item.type === 'file') {
                     num++;
+                    size=size+item.size;
                 } else if (item.children) {
                     //this.totalFiles(item.children)
                     file(item.children)
@@ -45,10 +46,11 @@ class ITree extends Component {
 
                 }
             }
-            return num;
+            let num_size=[num,size];
+            return num_size;
         }
-        let totalnum = file(obj);
-        return totalnum
+        let totalnum_size = file(obj);
+        return totalnum_size;
     }
 
     renderTreeNodes = (data) => {
@@ -71,14 +73,18 @@ class ITree extends Component {
     render() {
 
         return (
-            <div>
-            <DirectoryTree >
-                {this.renderTreeNodes(this.state.treeData)}
-            </DirectoryTree>
-            <Divider />
-                {'Total Files:'+this.totalFiles(this.state.treeData)}
-                <br/>
-                {'Total Filesize:'}
+            <div id='main'>
+                <div>
+                    <DirectoryTree className='tree'>
+                        {this.renderTreeNodes(this.state.treeData)}
+                    </DirectoryTree>
+                </div>
+            <Divider className='divider' />
+                <div id='total'>
+                    {'Total Files:'+' '+ this.totalFiles(this.state.treeData)[0]}
+                    <br/>
+                    {'Total Filesize:'+' '+ this.readablizeBytes(this.totalFiles(this.state.treeData)[1])}
+                </div>
             </div>
 
 
