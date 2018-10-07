@@ -4,7 +4,6 @@ import {Tree,Divider } from 'antd';
 
 const DirectoryTree = Tree.DirectoryTree;
 const TreeNode = Tree.TreeNode;
-//const url = "http://127.0.0.1:3000/data";
 const url = "https://chal-locdrmwqia.now.sh/";
 
 
@@ -19,19 +18,21 @@ class ITree extends Component {
         }
     };
 
+    //fetch data from URL;
     async componentDidMount(){
         let response = await fetch(url);
         let lastGist = await response.json();
         this.setState({treeData: lastGist.data});
-        //this.setState({treeData: lastGist});
     }
 
+    //Calculate units of size
     readablizeBytes = (bytes) =>{
         var s = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
         var e = Math.floor(Math.log(bytes)/Math.log(1024));
         return (bytes/Math.pow(1024, Math.floor(e))).toFixed(2)+" "+s[e];
     }
 
+    //Calculate total number and size of file
     totalFiles=(obj)=>{
         let num=0,size=0;
         let file=(o)=> {
@@ -53,6 +54,7 @@ class ITree extends Component {
         return totalnum_size;
     }
 
+    //Generated file directory
     renderTreeNodes = (data) => {
         return data.map((item) => {
             if (item.children) {
@@ -81,9 +83,9 @@ class ITree extends Component {
                 </div>
             <Divider className='divider' />
                 <div id='total'>
-                    {'Total Files:'+' '+ this.totalFiles(this.state.treeData)[0]}
+                    Total Files: {this.totalFiles(this.state.treeData)[0]}
                     <br/>
-                    {'Total Filesize:'+' '+ this.readablizeBytes(this.totalFiles(this.state.treeData)[1])}
+                    Total Filesize: {this.readablizeBytes(this.totalFiles(this.state.treeData)[1])}
                 </div>
             </div>
 
