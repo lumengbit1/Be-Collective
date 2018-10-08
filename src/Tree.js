@@ -1,3 +1,4 @@
+import 'babel-polyfill';
 import React, { Component } from 'react';
 import './Tree.css';
 import {Tree,Divider } from 'antd';
@@ -20,8 +21,13 @@ class ITree extends Component {
 
     //fetch data from URL;
     async componentDidMount(){
-        let response = await fetch(url);
-        let lastGist = await response.json();
+        let lastGist = await fetch(url).then(response => {
+            if (!response.ok) throw new Error(response.statusText);
+            return response.json();
+        }).catch(function(err) {
+            throw new Error(err);
+        })
+
         this.setState({treeData: lastGist.data});
     }
 
