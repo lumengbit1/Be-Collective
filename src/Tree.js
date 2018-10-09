@@ -1,4 +1,3 @@
-import 'babel-polyfill';
 import React, { Component } from 'react';
 import './Tree.css';
 import {Tree,Divider } from 'antd';
@@ -15,7 +14,7 @@ class ITree extends Component {
         super();
 
         this.state={
-            treeData: [],
+            treeData: [],//Save the acquired json data
         }
     };
 
@@ -92,9 +91,9 @@ class ITree extends Component {
                 </div>
             <Divider className='divider' />
                 <div id='total'>
-                    Total Files: {this.state.treeData.length===0?'':this.totalFiles(this.state.treeData)[0]}
+                    Total Files: {this.state.treeData.length === 0 ? '': this.totalFiles(this.state.treeData)[0]}
                     <br/>
-                    Total Filesize: {this.state.treeData.length===0?'':this.readablizeBytes(this.totalFiles(this.state.treeData)[1])}
+                    Total Filesize: {this.state.treeData.length === 0 ? '': this.readablizeBytes(this.totalFiles(this.state.treeData)[1])}
                 </div>
             </div>
 
