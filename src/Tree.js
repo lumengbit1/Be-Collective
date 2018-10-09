@@ -92,9 +92,9 @@ class ITree extends Component {
                 </div>
             <Divider className='divider' />
                 <div id='total'>
-                    Total Files: {this.totalFiles(this.state.treeData)[0]}
+                    Total Files: {this.state.treeData.length===0?'':this.totalFiles(this.state.treeData)[0]}
                     <br/>
-                    Total Filesize: {this.readablizeBytes(this.totalFiles(this.state.treeData)[1])}
+                    Total Filesize: {this.state.treeData.length===0?'':this.readablizeBytes(this.totalFiles(this.state.treeData)[1])}
                 </div>
             </div>
 
